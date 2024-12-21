@@ -7,3 +7,12 @@ mongoose.connect(process.env.mongoUrl!).then(() => {
 }).catch((err) => {
     console.log(`error connecting to mongodb` , err);
 })
+
+const UserSchema = new mongoose.Schema({
+    username : String ,
+    password : String,
+    publicKey : String,
+    privateKey : String    
+})
+
+export const UserModal = mongoose.model("user" , UserSchema);

@@ -1,4 +1,12 @@
 import express from 'express';
+import { UserModal } from './models';
+import { Keypair } from '@solana/web3.js';
+import Jwt from "jsonwebtoken"
+import dotenv from "dotenv"
+
+dotenv.config();
+
+
 
 const app = express();
 
@@ -6,17 +14,54 @@ app.use(express.json());
 
 
 
-app.post("/api/v1/signup" ,  (req , res) => {
+app.post("/api/v1/signup" ,  async (req , res) => {
+
+    const username = req.body.username;
+    const password = req.body.password;
+
+    const keypair = new Keypair();
+
+    //checking if a user exists with the same username
+    const exisitngUser = await UserModal.findOne({username});
+    if(exisitngUser){
+        res.status(400).json({
+            message : "user already exists"
+        })
+    }
+
+    await UserModal.create({
+        username,
+        password,
+        publicKey : keypair.publicKey.toString(),
+        privateKey : keypair.secretKey.toString(),
+    })
     res.json({
-        message : "signup route"
+        publicKey : keypair.publicKey.toString()
     })
 })
 
-app.post("/api/v1/signin" ,  (req , res) => {
+app.post("/api/v1/signin" ,  async (req , res) => {
 
-    res.json({
-        message : "signin route"
-    })
+    const username = req.body.username;
+    const password = req.body.password;
+
+    const user = await UserModal.findOne({username , password});
+
+    if(user){
+       const token =  Jwt.sign({
+            id : username
+       }, process.env.jwt_secret!)
+
+       res.json({
+        msg : "authenticated",
+        token
+       })
+    }else{
+        res.status(404).json({
+            message : "user not found"
+        })
+    }
+
 })
 
 app.post("/api/v1/tsx/sign" ,  (req , res) => {
