@@ -1,6 +1,6 @@
 import express from 'express';
 import { UserModal } from './models';
-import { Keypair } from '@solana/web3.js';
+import { Keypair, Transaction } from '@solana/web3.js';
 import Jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 
@@ -64,14 +64,20 @@ app.post("/api/v1/signin" ,  async (req , res) => {
 
 })
 
-app.post("/api/v1/tsx/sign" ,  (req , res) => {
+app.post("/api/v1/txn/sign" ,  (req , res) => {
 
     res.json({
         message : "sign transaction route"
     })
 })
 
-app.get("/api/v1/tsx" ,  (req , res) => {
+app.get("/api/v1/txn" ,  (req , res) => {
+    
+    const serializedTransaction  = req.body.serializedTransaction;
+
+    const transaction = Transaction.from(serializedTransaction);
+
+    transaction.sign()
 
     res.json({
         message : "sign transaction route"
