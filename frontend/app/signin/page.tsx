@@ -17,7 +17,7 @@ const SignIn = () => {
         const {data}  = await axios.post('http://localhost:3001/api/v1/signin', {
             username: username,
             password: password
-        })
+        },{ withCredentials: true })
 
         console.log(data);
 

@@ -14,7 +14,8 @@ const app = express();
 const corsOptions = {
     origin: "http://localhost:3000", 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
-    allowedHeaders: ['Content-Type', 'Authorization'], 
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true, 
   };
   
   app.use(cors(corsOptions));
@@ -29,8 +30,6 @@ app.post("/api/v1/signup" ,  async (req , res) => {
     const password = req.body.password;
 
     const keypair = new Keypair();
-
-    //checking if a user exists with the same username
     const exisitngUser = await UserModal.findOne({username});
     if(exisitngUser){
         res.status(400).json({
@@ -61,7 +60,10 @@ app.post("/api/v1/signin" ,  async (req , res) => {
             id : username
        }, process.env.jwt_secret!)
 
-       res.setHeader("Set-Cookie", `authToken=${token}; Path=/; HttpOnly; Secure; SameSite=Strict;`);
+       res.cookie('token', token, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000
+    });
 
        res.json({
         msg : "authenticated",
