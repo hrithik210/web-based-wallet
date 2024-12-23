@@ -14,12 +14,14 @@ const SignIn = () => {
   const SubmitHandler = useCallback(async () => {
 
     try {
-        const response  = await axios.post('http://localhost:3001/api/v1/signin', {
+        const {data}  = await axios.post('http://localhost:3001/api/v1/signin', {
             username: username,
             password: password
         })
 
-        const token = response.data.token;
+        console.log(data);
+
+        const token = data.token;
         localStorage.setItem('authToken', token);
 
         toast({description : "signed in" })
@@ -64,7 +66,7 @@ const SignIn = () => {
             </button>
         </div>
 
-        <label>
+        <label className='text-white'>
             Dont have  a Account? <a href="/signup" className='underline text-white font-medium'>Sign Up</a>
         </label>
 

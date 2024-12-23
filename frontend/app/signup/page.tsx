@@ -61,8 +61,8 @@ const SignUp = () => {
             </button>
         </div>
 
-        <label>
-            Already have an account? <a href="/signin">Sign in</a>
+        <label className='text-white'>
+          Already have an account? <a href="/signin" className='underline text-white font-medium'>Sign in</a>
         </label>
 
       </div>

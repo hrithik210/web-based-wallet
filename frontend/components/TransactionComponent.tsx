@@ -2,6 +2,8 @@
 import { useCallback, useState } from "react"
 import { Transaction , Connection , PublicKey, SystemProgram } from "@solana/web3.js"
 import axios from "axios"
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { get } from "http";
 
 const connection = new Connection('https://api.devnet.solana.com');
 
@@ -11,6 +13,8 @@ const TransactionComponent = () => {
   const [address ,setaddress] = useState('')
   const [amount ,setamount] = useState("")
 
+  const username = useCurrentUser();
+  console.log("user" ,username);
 
  const sendSol  = useCallback( async() => {
     const ix = SystemProgram.transfer({
@@ -34,6 +38,7 @@ const TransactionComponent = () => {
     console.log(serializedTransaction);
 
     await axios.post("http://localhost:3000/api/v1/txn/sign" , {
+      username : username ,
       message : serializedTransaction,
       retry : false
     })
