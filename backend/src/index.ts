@@ -3,6 +3,7 @@ import { UserModal } from './models';
 import { Keypair, Transaction } from '@solana/web3.js';
 import Jwt from "jsonwebtoken"
 import dotenv from "dotenv"
+import cors from "cors";
 
 dotenv.config();
 
@@ -10,7 +11,15 @@ dotenv.config();
 
 const app = express();
 
-app.use(express.json());
+const corsOptions = {
+    origin: "http://localhost:3000", 
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+    allowedHeaders: ['Content-Type', 'Authorization'], 
+  };
+  
+  app.use(cors(corsOptions));
+
+  app.use(express.json());
 
 
 
@@ -84,6 +93,6 @@ app.get("/api/v1/txn" ,  (req , res) => {
     })
 })
 
-app.listen(3000 , ()=>{
+app.listen(3001 , ()=>{
     console.log("Server is running on port 3000")
 });

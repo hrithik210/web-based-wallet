@@ -17,8 +17,15 @@ const models_1 = require("./models");
 const web3_js_1 = require("@solana/web3.js");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
+const corsOptions = {
+    origin: "http://localhost:3000",
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+};
+app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.json());
 app.post("/api/v1/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.body.username;
@@ -60,16 +67,19 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
     }
 }));
-app.post("/api/v1/tsx/sign", (req, res) => {
+app.post("/api/v1/txn/sign", (req, res) => {
     res.json({
         message: "sign transaction route"
     });
 });
-app.get("/api/v1/tsx", (req, res) => {
+app.get("/api/v1/txn", (req, res) => {
+    const serializedTransaction = req.body.serializedTransaction;
+    const transaction = web3_js_1.Transaction.from(serializedTransaction);
+    transaction.sign();
     res.json({
         message: "sign transaction route"
     });
 });
-app.listen(3000, () => {
+app.listen(3001, () => {
     console.log("Server is running on port 3000");
 });
