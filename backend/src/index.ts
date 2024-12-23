@@ -1,9 +1,14 @@
 import express from 'express';
 import { UserModal } from './models';
-import { Keypair, Transaction } from '@solana/web3.js';
-import Jwt from "jsonwebtoken"
+import { Keypair, Transaction , Connection } from '@solana/web3.js';
+import Jwt, { JwtPayload } from "jsonwebtoken"
 import dotenv from "dotenv"
 import cors from "cors";
+import cookieParser from 'cookie-parser';
+import bs58 from 'bs58';
+
+
+const connection = new Connection("https://api.devnet.solana.com");
 
 dotenv.config();
 
@@ -21,6 +26,7 @@ const corsOptions = {
   app.use(cors(corsOptions));
 
   app.use(express.json());
+  app.use(cookieParser());
 
 
 
@@ -77,20 +83,64 @@ app.post("/api/v1/signin" ,  async (req , res) => {
 
 })
 
-app.post("/api/v1/txn/sign" ,  (req , res) => {
+interface TokenPayload extends JwtPayload {
+    id: string;
+}
 
-    res.json({
-        message : "sign transaction route"
-    })
-})
+app.post("/api/v1/txn/sign", async (req : any, res : any) => {
 
-app.get("/api/v1/txn" ,  (req , res) => {
+    try {
+        const token = req.cookies.token;
+
+        if (!token) {
+          res.status(401).json({
+            message: "unauthorized",
+          });
+        }
+      
+        const decoded = Jwt.verify(token, process.env.jwt_secret!) as TokenPayload;
+      
+        const username = decoded.id;
+        console.log("username", username);
+        const user = await UserModal.findOne({username});
+        // const privateKeyString = user?.privateKey;
+        // const privateKeyArray = privateKeyString!.split(',').map(Number);
+      
+        // const keypair = Keypair.fromSecretKey(Uint8Array.from(privateKeyArray));
+      
+        const  demoPrivateKey = process.env.privateKey!;
+        let secretKey = bs58.decode(demoPrivateKey);
+        const demoKeyPair = Keypair.fromSecretKey(secretKey);
+
+        console.log("no error");
+        
+    const serializedTransaction = req.body.message;
+
+    const transaction = Transaction.from(Buffer.from(serializedTransaction));
+    transaction.feePayer = demoKeyPair.publicKey;
     
-    const serializedTransaction  = req.body.serializedTransaction;
+    const blockhash = await connection.getLatestBlockhash();
+    transaction.recentBlockhash = blockhash.blockhash;
+    
+    transaction.sign(demoKeyPair);
+    
+    await connection.sendTransaction(transaction, [demoKeyPair]);
+        
+      res.json({
+          message: "sign transaction route",
+        }); 
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message : "error"
+        });
+    }
+  
+});
 
-    const transaction = Transaction.from(serializedTransaction);
-
-    transaction.sign()
+app.get("/api/v1/txn" , async (req , res) => {
+    
+    
 
     res.json({
         message : "sign transaction route"
