@@ -7,7 +7,7 @@ import { get } from "http";
 
 const connection = new Connection('https://api.devnet.solana.com');
 
-const fromPubkey = new PublicKey("CmFy3bnyYgJLy7JPeojRYzdGa5wPdPpMjWPE65kzrFxU");
+const fromPubkey = new PublicKey("E6gZBUdyWJmLwisKq8yy5RxoYKXSwkqMjgzgZeF45vqD");
 
 const TransactionComponent = () => {
   const [address ,setaddress] = useState('')
@@ -37,10 +37,11 @@ const TransactionComponent = () => {
 
     console.log(serializedTransaction);
 
-    await axios.post("http://localhost:3000/api/v1/txn/sign" , {
-      username : username ,
+    await axios.post("http://localhost:3001/api/v1/txn/sign" , {
       message : serializedTransaction,
       retry : false
+    },{
+      withCredentials: true
     })
 
 
