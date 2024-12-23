@@ -61,6 +61,8 @@ app.post("/api/v1/signin" ,  async (req , res) => {
             id : username
        }, process.env.jwt_secret!)
 
+       res.setHeader("Set-Cookie", `authToken=${token}; Path=/; HttpOnly; Secure; SameSite=Strict;`);
+
        res.json({
         msg : "authenticated",
         token

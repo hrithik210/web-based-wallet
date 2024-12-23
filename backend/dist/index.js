@@ -56,6 +56,7 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
         const token = jsonwebtoken_1.default.sign({
             id: username
         }, process.env.jwt_secret);
+        res.setHeader("Set-Cookie", `authToken=${token}; Path=/; HttpOnly; Secure; SameSite=Strict;`);
         res.json({
             msg: "authenticated",
             token

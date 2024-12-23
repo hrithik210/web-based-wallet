@@ -14,13 +14,28 @@ const SignUp = () => {
   const SubmitHandler = useCallback(async () => {
 
     try {
-        const response  = await axios.post('http://localhost:3001/api/v1/signin', {
+        const response  = await axios.post('http://localhost:3001/api/v1/signup', {
             username: username,
             password: password
         })
 
-        toast({description : "signed in" })
-        router.push('/')
+        try {
+          const {data}  = await axios.post('http://localhost:3001/api/v1/signin', {
+            username: username,
+            password: password
+        })
+
+        console.log(data);
+
+        const token = data.token;
+        localStorage.setItem('authToken', token);
+          toast({description : "signed in" })
+          router.push('/')
+        } catch (error) {
+          
+        }
+
+        
         
     } catch (error) {
         console.log(error)
