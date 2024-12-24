@@ -4,6 +4,7 @@ import { Transaction , Connection , PublicKey, SystemProgram } from "@solana/web
 import axios from "axios"
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { get } from "http";
+import { toast } from "@/hooks/use-toast";
 
 const connection = new Connection('https://api.devnet.solana.com');
 
@@ -37,12 +38,20 @@ const TransactionComponent = () => {
 
     console.log(serializedTransaction);
 
-    await axios.post("http://localhost:3001/api/v1/txn/sign" , {
-      message : serializedTransaction,
-      retry : false
-    },{
-      withCredentials: true
-    })
+    try {
+      await axios.post("http://localhost:3001/api/v1/txn/sign" , {
+        message : serializedTransaction,
+        retry : false
+      },{
+        withCredentials: true
+      })
+      
+      toast({description : "transaction successfull" })
+    } catch (error) {
+      console.log(error);
+      toast({description : "error in transaction" , variant: "destructive"})
+    }
+
 
 
 
